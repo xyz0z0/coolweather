@@ -1,11 +1,11 @@
 package xyz.xyz0z0.coolweather.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import xyz.xyz0z0.coolweather.db.City;
 import xyz.xyz0z0.coolweather.db.County;
@@ -45,6 +45,7 @@ public class Utility {
                     City city = new City();
                     city.setCityName(cityObject.getString("name"));
                     city.setCityCode(cityObject.getInt("id"));
+                    city.setProvinceId(provinceId);
                     city.save();
                 }
                 return true;
