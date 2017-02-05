@@ -7,3 +7,4 @@ package xyz.xyz0z0.coolweather.util;
 public class ApiKey {
     public static String HEAPI = "f772003b34ea446a882eda8781a379f7";
 }
+
