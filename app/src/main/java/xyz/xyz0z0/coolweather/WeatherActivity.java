@@ -32,6 +32,8 @@ import xyz.xyz0z0.coolweather.service.AutoUpdateService;
 import xyz.xyz0z0.coolweather.util.HttpUtil;
 import xyz.xyz0z0.coolweather.util.Utility;
 
+import static xyz.xyz0z0.coolweather.util.ApiKey.HEAPI;
+
 public class WeatherActivity extends AppCompatActivity {
 
     public SwipeRefreshLayout swipeRefreshLayout;
@@ -121,7 +123,9 @@ public class WeatherActivity extends AppCompatActivity {
      * 根据天气id请求城市天气信息
      */
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=f772003b34ea446a882eda8781a379f7";//TODO key独立出来
+//        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=key";//郭大神的api获取地址
+        String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId + "&key=" + HEAPI;//和风官方获取地址
+
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

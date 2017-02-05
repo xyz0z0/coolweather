@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -134,7 +135,8 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
         } else {
-            String address = "http://guolin.tech/api/china";
+//            String address = "http://guolin.tech/api/china";
+            String address = "http://api.xyz0z0.xyz/coolweather/china/";
             queryFromServer(address, "province");
         }
     }
@@ -156,7 +158,8 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         } else {
             int provinceCode = selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode;
+//            String address = "http://guolin.tech/api/china/" + provinceCode;
+            String address = "http://api.xyz0z0.xyz/coolweather/china/" + provinceCode;
             queryFromServer(address, "city");
         }
     }
@@ -179,7 +182,8 @@ public class ChooseAreaFragment extends Fragment {
         } else {
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+//            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+            String address = "http://api.xyz0z0.xyz/coolweather/china/" + provinceCode + "/" + cityCode;
             queryFromServer(address, "county");
         }
     }
@@ -193,6 +197,8 @@ public class ChooseAreaFragment extends Fragment {
     private void queryFromServer(String address, final String type) {
         showProgressDialog();
         HttpUtil.sendOkHttpRequest(address, new Callback() {
+
+
             @Override
             public void onFailure(Call call, IOException e) {
                 // 通过 runOnUiThread() 方法回到主线程处理逻辑

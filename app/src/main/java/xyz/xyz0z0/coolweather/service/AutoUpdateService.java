@@ -18,6 +18,8 @@ import xyz.xyz0z0.coolweather.gson.Weather;
 import xyz.xyz0z0.coolweather.util.HttpUtil;
 import xyz.xyz0z0.coolweather.util.Utility;
 
+import static xyz.xyz0z0.coolweather.util.ApiKey.HEAPI;
+
 public class AutoUpdateService extends Service {
     public AutoUpdateService() {
     }
@@ -52,7 +54,7 @@ public class AutoUpdateService extends Service {
             final Weather weather = Utility.handleWeatherResponse(weatherString);
             final String weatherId = weather.basic.weatherId;
 
-            String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=f772003b34ea446a882eda8781a379f7";//TODO
+            String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId + "&key=" + HEAPI;//和风官方获取地址
             HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
