@@ -2,30 +2,38 @@ package xyz.xyz0z0.coolweather;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+import xyz.xyz0z0.coolweather.db.SelectedList;
 import xyz.xyz0z0.coolweather.gson.Forecast;
 import xyz.xyz0z0.coolweather.gson.Weather;
 import xyz.xyz0z0.coolweather.service.AutoUpdateService;
@@ -34,8 +42,9 @@ import xyz.xyz0z0.coolweather.util.Utility;
 
 import static xyz.xyz0z0.coolweather.util.ApiKey.HEAPI;
 
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static int CHOOSECODE = 1;
     public SwipeRefreshLayout swipeRefreshLayout;
     public DrawerLayout drawerLayout;
     private ScrollView weatherLayout;
@@ -51,16 +60,34 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView sportText;
     private ImageView bingPicImg;
     private Button navButton;
+    private TextView exit_textview;
+    private TextView add_textview;
+    private ArrayAdapter<String> adapter;
+    private List<String> selectedList = new ArrayList<>();
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= 21) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
         setContentView(R.layout.activity_weather);
+
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        if (prefs.getString("weather", null) == null) {
+//            Intent intent = new Intent(this, ChooseAreaActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
+
+        List<SelectedList> lists = DataSupport.findAll(SelectedList.class);
+        int cityId = lists.size() + 1;
+        if (lists.size() == 0) {
+            Intent chooseIntent = new Intent(this, ChooseAreaActivity.class);
+            chooseIntent.putExtra("cityId", cityId);
+            startActivityForResult(chooseIntent, CHOOSECODE);
+        }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // 初始化各个控件
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
@@ -75,16 +102,35 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText = (TextView) findViewById(R.id.car_wash_text);
         sportText = (TextView) findViewById(R.id.sport_text);
 
-        bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
+//        bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        ListView cityListView = (ListView) findViewById(R.id.navigation_drawer_list);
+
+        exit_textview = (TextView) findViewById(R.id.exit_textview);
+        add_textview = (TextView) findViewById(R.id.add_textview);
+        exit_textview.setOnClickListener(this);
+        add_textview.setOnClickListener(this);
+
+
+        for (SelectedList list : lists) {
+            selectedList.add(list.getSelectedName());
+        }
+
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
         navButton = (Button) findViewById(R.id.nav_button);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString("weather", null);
+        SharedPreferences infPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString = infPrefs.getString("weather", null);
         final String weatherId;
         if (weatherString != null) {
             // 有缓存时直接解析天气数据
@@ -111,13 +157,44 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
 
-        String bingPic = prefs.getString("bing_pic", null);
-        if (bingPic != null) {
-            Glide.with(this).load(bingPic).into(bingPicImg);
-        } else {
-            loadBingPic();
-        }
+//        String bingPic = prefs.getString("bing_pic", null);
+//        if (bingPic != null) {
+//            Glide.with(this).load(bingPic).into(bingPicImg);
+//        } else {
+//            loadBingPic();
+//        }
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, selectedList);
+        cityListView.setAdapter(adapter);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+
+            case R.id.settings:
+                Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
 
     /**
      * 根据天气id请求城市天气信息
@@ -183,7 +260,7 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+//                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
                     }
                 });
             }
@@ -233,6 +310,24 @@ public class WeatherActivity extends AppCompatActivity {
             startService(intent);
         } else {
             Toast.makeText(this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.exit_textview:
+                finish();
+                break;
+            case R.id.add_textview:
+                if (selectedList.size() < 7) {
+                    Intent intent = new Intent(this, ChooseAreaActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "只能添加7个城市", Toast.LENGTH_SHORT).show();
+                }
+
+
         }
     }
 }

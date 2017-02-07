@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +27,11 @@ import okhttp3.Response;
 import xyz.xyz0z0.coolweather.db.City;
 import xyz.xyz0z0.coolweather.db.County;
 import xyz.xyz0z0.coolweather.db.Province;
+import xyz.xyz0z0.coolweather.db.SelectedList;
 import xyz.xyz0z0.coolweather.util.HttpUtil;
 import xyz.xyz0z0.coolweather.util.Utility;
+
+import static xyz.xyz0z0.coolweather.WeatherActivity.CHOOSECODE;
 
 /**
  * Created by Administrator on 2017/2/4 0004.
@@ -90,17 +92,22 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherId = countyList.get(position).getWeatherId();
-                    if (getActivity() instanceof MainActivity) {
-                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                        intent.putExtra("weather_id", weatherId);
-                        startActivity(intent);
-                        getActivity().finish();
-                    } else if (getActivity() instanceof WeatherActivity) {
-                        WeatherActivity activity = (WeatherActivity) getActivity();
-                        activity.drawerLayout.closeDrawers();
-                        activity.swipeRefreshLayout.setRefreshing(true);
-                        activity.requestWeather(weatherId);
-                    }
+
+                    SelectedList selectedList = new SelectedList();
+                    selectedList.setSelectedName(countyList.get(position).getCountyName());
+                    selectedList.setSelectedId(weatherId);
+                    selectedList.save();
+
+                    List<SelectedList> lists = DataSupport.findAll(SelectedList.class);
+                    int result = lists.size();
+
+
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", weatherId);
+                    getActivity().setResult(CHOOSECODE, intent);
+                    getActivity().finish();
+
+
                 }
             }
         });
@@ -135,8 +142,8 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
         } else {
-//            String address = "http://guolin.tech/api/china";
-            String address = "http://api.xyz0z0.xyz/coolweather/china/";
+            String address = "http://guolin.tech/api/china";
+//            String address = "http://api.xyz0z0.xyz/coolweather/china/";
             queryFromServer(address, "province");
         }
     }
@@ -158,8 +165,8 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         } else {
             int provinceCode = selectedProvince.getProvinceCode();
-//            String address = "http://guolin.tech/api/china/" + provinceCode;
-            String address = "http://api.xyz0z0.xyz/coolweather/china/" + provinceCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode;
+//            String address = "http://api.xyz0z0.xyz/coolweather/china/" + provinceCode;
             queryFromServer(address, "city");
         }
     }
@@ -182,8 +189,8 @@ public class ChooseAreaFragment extends Fragment {
         } else {
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-//            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
-            String address = "http://api.xyz0z0.xyz/coolweather/china/" + provinceCode + "/" + cityCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+//            String address = "http://api.xyz0z0.xyz/coolweather/china/" + provinceCode + "/" + cityCode;
             queryFromServer(address, "county");
         }
     }
