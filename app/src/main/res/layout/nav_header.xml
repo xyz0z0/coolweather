@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="180dp"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
     android:background="@color/blue500"
     android:orientation="vertical">
@@ -12,5 +13,13 @@
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <com.github.pwittchen.weathericonview.WeatherIconView
+        android:id="@+id/my_weather_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        custom:weatherIconResource="@string/wi_day_sunny_overcast"
+        custom:weatherIconColor="@android:color/black"
+        custom:weatherIconSize="100" />
 
 </RelativeLayout>
