@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -34,27 +35,19 @@ import xyz.xyz0z0.coolweather.util.Utility;
 public class ChooseAreaActivity extends AppCompatActivity {
 
     public static final int LEVEL_PROVINCE = 0;
-
     public static final int LEVEL_CITY = 1;
-
     public static final int LEVEL_COUNTY = 2;
-
     private ProgressDialog progressDialog;
 
-    private TextView titleText;
-
-    private Button backButton;
-
-    private ListView listView;
+    @BindView(R.id.title_text) TextView titleText;
+    @BindView(R.id.back_button) Button backButton;
+    @BindView(R.id.list_view) ListView listView;
 
     private ArrayAdapter<String> adapter;
-
     private List<String> dataList = new ArrayList<>();
-
     private List<Province> provinceList;
     private List<City> cityList;
     private List<County> countyList;
-
     private Province selectedProvince;
     private City selectedCity;
     private int currentLevel;
@@ -63,16 +56,6 @@ public class ChooseAreaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        if (prefs.getString("weather", null) != null) {
-//            Intent intent = new Intent(this, WeatherActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
-        titleText = (TextView) findViewById(R.id.title_text);
-        backButton = (Button) findViewById(R.id.back_button);
-        listView = (ListView) findViewById(R.id.list_view);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);

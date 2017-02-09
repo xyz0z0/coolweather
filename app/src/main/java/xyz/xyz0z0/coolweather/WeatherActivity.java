@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -46,35 +50,41 @@ import static xyz.xyz0z0.coolweather.util.ApiKey.HEAPI;
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final int CHOOSECODE = 1;
-    public SwipeRefreshLayout swipeRefreshLayout;
-    public DrawerLayout drawerLayout;
-    private ScrollView weatherLayout;
-    private TextView titleCity;
-    private TextView titleUpdateTime;
-    private TextView degreeText;
-    private TextView weatherInfoText;
-    private LinearLayout forecastLayout;
-    private TextView aqiText;
-    private TextView pm25Text;
-    private TextView comfortText;
-    private TextView carWashText;
-    private TextView sportText;
     private ImageView bingPicImg;
-    private Button navButton;
-    private TextView exit_textview;
-    private TextView add_textview;
     private ArrayAdapter<String> adapter;
     private List<String> selectedList = new ArrayList<>();
-    private NavigationView navigationView;
-
     private String selectedCityId;
     private List<SelectedList> lists;
     private String weatherId;
+
+    @BindView(R.id.swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @BindView(R.id.navigation_view) NavigationView navigationView;
+    @BindView(R.id.weather_layout) ScrollView weatherLayout;
+    @BindView(R.id.title_city) TextView titleCity;
+    @BindView(R.id.title_update_time) TextView titleUpdateTime;
+    @BindView(R.id.degree_text) TextView degreeText;
+    @BindView(R.id.weather_info_text) TextView weatherInfoText;
+    @BindView(R.id.forecast_layout) LinearLayout forecastLayout;
+    @BindView(R.id.aqi_text) TextView aqiText;
+    @BindView(R.id.pm25_text) TextView pm25Text;
+    @BindView(R.id.comfort_text) TextView comfortText;
+    @BindView(R.id.car_wash_text) TextView carWashText;
+    @BindView(R.id.sport_text) TextView sportText;
+    @BindView(R.id.nav_button) Button navButton;
+    @OnClick(R.id.nav_button)
+    public void nav(){
+        drawerLayout.openDrawer(GravityCompat.START);
+    }
+    @BindView(R.id.exit_textview) TextView exit_textview;
+    @BindView(R.id.add_textview) TextView add_textview;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+        ButterKnife.bind(this);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         selectedCityId = prefs.getString("SelectedCity", null);
@@ -85,69 +95,26 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         lists = DataSupport.findAll(SelectedList.class);
-//        cityId = "city" + lists.size();
-//        if (lists.size() == 0) {
-//            Intent chooseIntent = new Intent(this, ChooseAreaActivity.class);
-////            chooseIntent.putExtra("cityId", cityId);
-//            startActivity(chooseIntent);
-//            finish();
-//        }
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // 初始化各个控件
-        weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
-        titleCity = (TextView) findViewById(R.id.title_city);
-        titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
-        degreeText = (TextView) findViewById(R.id.degree_text);
-        weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
-        forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
-        aqiText = (TextView) findViewById(R.id.aqi_text);
-        pm25Text = (TextView) findViewById(R.id.pm25_text);
-        comfortText = (TextView) findViewById(R.id.comfort_text);
-        carWashText = (TextView) findViewById(R.id.car_wash_text);
-        sportText = (TextView) findViewById(R.id.sport_text);
-
 //        bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
-
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
         ListView cityListView = (ListView) findViewById(R.id.navigation_drawer_list);
-
-        exit_textview = (TextView) findViewById(R.id.exit_textview);
-        add_textview = (TextView) findViewById(R.id.add_textview);
         exit_textview.setOnClickListener(this);
         add_textview.setOnClickListener(this);
-
-
         for (SelectedList list : lists) {
             selectedList.add(list.getSelectedName());
         }
-
-
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
-        navButton = (Button) findViewById(R.id.nav_button);
-
         query(selectedCityId);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 requestWeather(weatherId);
-            }
-        });
-
-        navButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
 
@@ -163,18 +130,12 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         cityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                selectedList.get(position);
-//                Toast.makeText(WeatherActivity.this, lists.get(position).getSelectedName(), Toast.LENGTH_SHORT).show();
                 weatherId = lists.get(position).getSelectedId();
                 drawerLayout.closeDrawer(GravityCompat.START);
-
                 query(weatherId);
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                 editor.putString("SelectedCity", weatherId);
                 editor.apply();
-//                requestWeather(lists.get(position).getSelectedId());
-
-
             }
         });
     }
@@ -195,22 +156,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
             requestWeather(weatherId);
         }
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-////        super.onActivityResult(requestCode, resultCode, data);
-//        switch (requestCode) {
-//            case CHOOSECODE:
-//                if (resultCode == RESULT_OK) {
-//                    String weatherId = data.getStringExtra("weather_id");
-//                    requestWeather(weatherId);
-//                }
-//                break;
-//            default:
-//                break;
-//
-//        }
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -369,8 +314,6 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                 } else {
                     Toast.makeText(this, "只能添加7个城市", Toast.LENGTH_SHORT).show();
                 }
-
-
         }
     }
 
