@@ -11,7 +11,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +24,8 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.tencent.bugly.crashreport.CrashReport;
 
 import org.litepal.crud.DataSupport;
 
@@ -50,6 +51,40 @@ import static xyz.xyz0z0.coolweather.util.ApiKey.HEAPI;
 public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final int CHOOSECODE = 1;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+    @BindView(R.id.navigation_view)
+    NavigationView navigationView;
+    @BindView(R.id.weather_layout)
+    ScrollView weatherLayout;
+    @BindView(R.id.title_city)
+    TextView titleCity;
+    @BindView(R.id.title_update_time)
+    TextView titleUpdateTime;
+    @BindView(R.id.degree_text)
+    TextView degreeText;
+    @BindView(R.id.weather_info_text)
+    TextView weatherInfoText;
+    @BindView(R.id.forecast_layout)
+    LinearLayout forecastLayout;
+    @BindView(R.id.aqi_text)
+    TextView aqiText;
+    @BindView(R.id.pm25_text)
+    TextView pm25Text;
+    @BindView(R.id.comfort_text)
+    TextView comfortText;
+    @BindView(R.id.car_wash_text)
+    TextView carWashText;
+    @BindView(R.id.sport_text)
+    TextView sportText;
+    @BindView(R.id.nav_button)
+    Button navButton;
+    @BindView(R.id.exit_textview)
+    TextView exit_textview;
+    @BindView(R.id.add_textview)
+    TextView add_textview;
     private ImageView bingPicImg;
     private ArrayAdapter<String> adapter;
     private List<String> selectedList = new ArrayList<>();
@@ -57,28 +92,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
     private List<SelectedList> lists;
     private String weatherId;
 
-    @BindView(R.id.swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
-    @BindView(R.id.navigation_view) NavigationView navigationView;
-    @BindView(R.id.weather_layout) ScrollView weatherLayout;
-    @BindView(R.id.title_city) TextView titleCity;
-    @BindView(R.id.title_update_time) TextView titleUpdateTime;
-    @BindView(R.id.degree_text) TextView degreeText;
-    @BindView(R.id.weather_info_text) TextView weatherInfoText;
-    @BindView(R.id.forecast_layout) LinearLayout forecastLayout;
-    @BindView(R.id.aqi_text) TextView aqiText;
-    @BindView(R.id.pm25_text) TextView pm25Text;
-    @BindView(R.id.comfort_text) TextView comfortText;
-    @BindView(R.id.car_wash_text) TextView carWashText;
-    @BindView(R.id.sport_text) TextView sportText;
-    @BindView(R.id.nav_button) Button navButton;
     @OnClick(R.id.nav_button)
-    public void nav(){
+    public void nav() {
         drawerLayout.openDrawer(GravityCompat.START);
     }
-    @BindView(R.id.exit_textview) TextView exit_textview;
-    @BindView(R.id.add_textview) TextView add_textview;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +124,7 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
