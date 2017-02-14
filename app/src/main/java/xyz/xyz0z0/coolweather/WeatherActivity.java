@@ -43,6 +43,7 @@ import xyz.xyz0z0.coolweather.db.SelectedList;
 import xyz.xyz0z0.coolweather.gson.Forecast;
 import xyz.xyz0z0.coolweather.gson.Weather;
 import xyz.xyz0z0.coolweather.service.AutoUpdateService;
+import xyz.xyz0z0.coolweather.ui.activity.AboutActivity;
 import xyz.xyz0z0.coolweather.util.HttpUtil;
 import xyz.xyz0z0.coolweather.util.Utility;
 
@@ -182,8 +183,9 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
 
-            case R.id.settings:
-                Toast.makeText(this, "设置", Toast.LENGTH_SHORT).show();
+            case R.id.about:
+                Intent intent = new Intent(WeatherActivity.this, AboutActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;

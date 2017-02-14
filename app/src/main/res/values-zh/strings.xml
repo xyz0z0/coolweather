@@ -2,4 +2,9 @@
 <resources>
     <string name="app_name">酷天气</string>
     <string name="settings">设置</string>
+    <string name="about_project_url">https://github.com</string>
+    <string name="about_weibo">http://weibo.com</string>
+    <string name="about_jianshu">http://www.jianshu.com</string>
+    <string name="about_github">https://github.com</string>
+    <string name="about">关于</string>
 </resources>

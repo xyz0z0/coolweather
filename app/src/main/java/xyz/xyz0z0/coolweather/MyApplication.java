@@ -3,6 +3,7 @@ package xyz.xyz0z0.coolweather;
 import android.app.Application;
 import android.content.Context;
 
+import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import org.litepal.LitePalApplication;
@@ -20,7 +21,8 @@ public class MyApplication extends Application {
         context = getApplicationContext();
         LitePalApplication.initialize(context);
         //初始化 bugly
-        CrashReport.initCrashReport(context, "5013817760", true);
+//        CrashReport.initCrashReport(context, "5013817760", true);
+        Bugly.init(context, "5013817760", true);
     }
 
     public static Context getContext(){
